@@ -1,0 +1,76 @@
+    ____________    _________    __  ______________ __  __
+   / ____/  _/ /   / ____/   |  /  |/  / ____/ ___// / / /
+  / / __ / // /   / / __/ /| | / /|_/ / __/  \__ \/ /_/ /
+ / /_/ // // /___/ /_/ / ___ |/ /  / / /___ ___/ / __  /
+ \____/___/_____/\____/_/  |_/_/  /_/_____//____/_/ /_/
+
+Design Considerations
+------------------------------------------------------------
+Javascript or Unity C#
+Javascript or interpreted language
+Webworkers?
+Scheduler?
+Union filesystem
+
+Gilgamesh Classes
+------------------------------------------------------------
+Node
+  type: device, router
+  role?
+  hardware
+    cpu
+    memory
+  operating system
+    version
+    filesystems
+      root
+    system calls
+    devices
+    processes
+    users
+
+Filesystems
+  mount point
+  type
+  size
+  filetable
+  datatable
+
+VFS Filetable Entry
+
+GFS Filetable Entry
+  type: file, symlink, hardlink, directory, device
+  permission
+  timestamps
+  data
+
+Directory Data
+  children
+
+File / Hardlink Data
+  reference count
+  data
+
+Symlink Data
+  path
+
+Device Data
+  type: block, character
+  major
+  minor
+
+NetFS Filetable entry
+
+Utilities
+------------------------------------------------------------
+  Deep Clone
+  Mersenne Twister
+
+Ideas
+------------------------------------------------------------
+  mesh - shell
+  cat images (ascii?)
+  vulnerabilities based on version
+  vulnerability list
+  scan tool (meshmap) - automatically populated
+  Crazy uncle gifts you the laptop
