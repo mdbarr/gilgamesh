@@ -1,15 +1,43 @@
 'use strict';
 
-function BitField(bits) {
+const FLAGS = {
+  ZF: 0, // Zero Flag
+  CF: 1, // Carry Flag
+  OF: 2, // Overflow Flag
+  PF: 3, // Parity Flag
+  TF: 4, // Trap Flag
+  HF: 5, // Half Carry Flag
+  SF: 6, // Sign Flag (Negative Flag)
+  IF: 7 // Interrupt Enabled Flag
+};
+
+const INSTRUCTION_SET = {
+  NOP: 0, // No Operation
+
+  // Arithmetic and Logic Instructions
+  ADD: 1, // Add without Carry
+  ADC: 2, // Add with Carry
+  ADIW: 3, // Add Immediate to Word
+
+  SUB: 4, // Subtract without Carry
+  SUBI: 5, // Subtract Immediate
+  SBC: 6, // Subtract with Carry
+  SBCI: 7, // Subtract Immediate with Carry
+  SBIW: 8, // Subtract Immediate from Word
+
+  AND: 9, // Logical And
+  ANDI: 10 // Logical And with Immediate
+
+};
+
+function BitField(bits = 8) {
   const bytes = Math.ceil(bits / 8);
   const field = new Uint8Array(bytes);
 
   this.get = function(index) {
     const offset = index >> 3;
     const value = field[offset];
-
     return !!(value & (128 >> (index % 8)));
-
   };
 
   this.set = function(index, set = true) {
@@ -28,13 +56,30 @@ function BitField(bits) {
       field.fill(0, bytes, 0);
     }
   };
+
+  this.value = function() {
+    let value = 0;
+    for (let i = 0; i < bytes; i++) {
+      value = value << 8;
+      value += field[i];
+    }
+    return value;
+  };
+
+  this.toInteger = function() {
+    const integer = new Integer({
+      bits
+    });
+    integer.set(this.value());
+    return integer;
+  };
 }
 
 function Integer({
   bits = 8, signed = false
-}) {
+} = {}) {
   const bytes = Math.ceil(bits / 8);
-  const data = new Buffer(bytes);
+  const data = new ArrayBuffer(bytes);
   const view = new DataView(data);
 
   this.get = function() {
@@ -84,11 +129,12 @@ function Integer({
   this.clear = () => this.set(0);
 }
 
+// High / Low
 function IntegerField({
   bits = 8, size = 256, signed = false
-}) {
+} = {}) {
   const bytes = Math.ceil(bits / 8);
-  const data = new Buffer(bytes * size);
+  const data = new ArrayBuffer(bytes * size);
   const view = new DataView(data);
 
   this.get = function(index) {
@@ -142,12 +188,16 @@ function IntegerField({
     if (index !== undefined) {
       this.set(index);
     } else {
-      data.fill(0, data.length, 0);
+      for (let i = 0; i < view.byteLength; i++) {
+        view.setUint8(i, 0);
+      }
     }
   };
 }
 
 module.exports = {
+  FLAGS,
+  INSTRUCTION_SET,
   BitField,
   Integer,
   IntegerField

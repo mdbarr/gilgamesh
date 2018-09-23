@@ -3,6 +3,12 @@
 'use strict';
 
 ////////////////////////////////////////////////////////////
+// Chipsets
+
+//const architecture = require('./chipsets/architecture');
+const M1047 = require('./chipsets/m1047');
+
+////////////////////////////////////////////////////////////
 // Merseene Twister Pseudo-Random Number Generator
 
 function MersenneTwister(seed) {
@@ -116,3 +122,8 @@ Object.clone = function(object, deep = true) {
 Object.deepClone = function(object) {
   return deepClone(object);
 };
+
+////////////////////////////////////////////////////////////
+
+const m1047 = new M1047();
+console.log(m1047 instanceof M1047);
