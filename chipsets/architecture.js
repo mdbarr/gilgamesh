@@ -27,7 +27,23 @@ const INSTRUCTION_SET = {
 
   AND: 9, // Logical And
   ANDI: 10 // Logical And with Immediate
+};
 
+const INSTRUCTIONS = {
+  NOP: { // No Operation
+    chipset: 8,
+    opcode: 0x00
+  },
+  ADD: { // Add without Carry
+    chipset: 8,
+    opcode: 0x01,
+    operands: [ 'Rd', 'Rr' ]
+  },
+  ADC: { // Add with Carry
+    chipset: 8,
+    opcode: 0x02,
+    operands: [ 'Rd', 'Rr' ]
+  }
 };
 
 function BitField(bits = 8) {
@@ -104,6 +120,50 @@ function Integer({
     }
   };
 
+  this.getHigh = function() {
+    if (bits === 32) {
+      if (signed) {
+        return view.getInt16(0);
+      } else {
+        return view.getUint16(0);
+      }
+    } else if (bits === 16) {
+      if (signed) {
+        return view.getInt8(0);
+      } else {
+        return view.getUint8(0);
+      }
+    } else {
+      if (signed) {
+        return view.getInt8(0);
+      } else {
+        return view.getUint8(0);
+      }
+    }
+  };
+
+  this.getLow = function() {
+    if (bits === 32) {
+      if (signed) {
+        return view.getInt16(2);
+      } else {
+        return view.getUint16(2);
+      }
+    } else if (bits === 16) {
+      if (signed) {
+        return view.getInt8(1);
+      } else {
+        return view.getUint8(1);
+      }
+    } else {
+      if (signed) {
+        return view.getInt8(0);
+      } else {
+        return view.getUint8(0);
+      }
+    }
+  };
+
   this.set = function(value = 0) {
     if (bits === 32) {
       if (signed) {
@@ -129,7 +189,7 @@ function Integer({
   this.clear = () => this.set(0);
 }
 
-// High / Low
+// High / Low, asInteger
 function IntegerField({
   bits = 8, size = 256, signed = false
 } = {}) {
@@ -198,6 +258,7 @@ function IntegerField({
 module.exports = {
   FLAGS,
   INSTRUCTION_SET,
+  INSTRUCTIONS,
   BitField,
   Integer,
   IntegerField

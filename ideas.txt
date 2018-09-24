@@ -88,3 +88,10 @@ NetFS Filetable entry
   GPIO / Misc Devices and Sensors
     CPU Temp Sensors + Fans = crash
   overclock
+
+
+Cracking
+NOPs are often involved when cracking software that checks for serial numbers, specific hardware or software requirements, presence or absence of hardware dongles, etc. This is accomplished by altering functions and subroutines to bypass security checks and instead simply return the expected value being checked for. Because most of the instructions in the security check routine will be unused, these would be replaced with NOPs, thus removing the software's security functionality without attracting any attention.
+
+Security exploits
+The NOP opcode can be used to form a NOP slide, which allows code to execute when the exact value of the instruction pointer is indeterminate (e.g., when a buffer overflow causes a function's return address on the stack to be overwritten).

@@ -6,11 +6,11 @@ function m1047() {
   const chipset = {
     bits: 8,
     registers: 8,
-    ram: 256,
     io: {
       digital: 4,
       analog: 2
     },
+    ram: 256,
     speed: 16
   };
 
@@ -25,6 +25,15 @@ function m1047() {
   });
 
   const flags = new architecture.BitField(chipset.bits);
+
+  const io = {
+    digital: new architecture.BitField(chipset.io.digital),
+    analog: new architecture.IntegerField({
+      bits: chipset.bits,
+      size: chipset.io.analog,
+      signed: false
+    })
+  };
 
   const ram = new architecture.IntegerField({
     bits: chipset.bits,
@@ -45,9 +54,14 @@ function m1047() {
 
   registers.clear();
   flags.clear();
-  ram.clear();
+
+  io.digital.clear();
+  io.analog.clear();
+
   sp.clear();
   ip.clear();
+
+  ram.clear();
 
   //////////
 
