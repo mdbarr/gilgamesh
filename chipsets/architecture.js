@@ -98,6 +98,18 @@ function Integer({
   const data = new ArrayBuffer(bytes);
   const view = new DataView(data);
 
+  Object.defineProperty(this, 'bits', {
+    get: () => bits
+  });
+
+  Object.defineProperty(this, 'signed', {
+    get: () => signed
+  });
+
+  Object.defineProperty(this, 'bytes', {
+    get: () => bytes
+  });
+
   this.get = function() {
     if (bits === 32) {
       if (signed) {
@@ -134,11 +146,7 @@ function Integer({
         return view.getUint8(0);
       }
     } else {
-      if (signed) {
-        return view.getInt8(0);
-      } else {
-        return view.getUint8(0);
-      }
+      return (view.getUint8(0) & 0xF0) >> 4;
     }
   };
 
@@ -156,11 +164,7 @@ function Integer({
         return view.getUint8(1);
       }
     } else {
-      if (signed) {
-        return view.getInt8(0);
-      } else {
-        return view.getUint8(0);
-      }
+      return view.getUint8(0) & 0x0F;
     }
   };
 
@@ -186,16 +190,76 @@ function Integer({
     }
   };
 
+  this.setHigh = function(value = 0) {
+    if (bits === 32) {
+      if (signed) {
+        return view.setInt16(0, value);
+      } else {
+        return view.setUint16(0, value);
+      }
+    } else if (bits === 16) {
+      if (signed) {
+        return view.setInt8(0, value);
+      } else {
+        return view.setUint8(0, value);
+      }
+    } else {
+      value = (view.getUint8(0) & 0x0F) | ((value << 4) & 0xF0);
+      return view.setUint8(0, value);
+    }
+  };
+
+  this.setLow = function(value = 0) {
+    if (bits === 32) {
+      if (signed) {
+        return view.setInt16(2, value);
+      } else {
+        return view.setUint16(2, value);
+      }
+    } else if (bits === 16) {
+      if (signed) {
+        return view.setInt8(1, value);
+      } else {
+        return view.setUint8(1, value);
+      }
+    } else {
+      value = (view.getUint8(0) & 0xF0) | (value & 0x0F);
+      return view.setUint8(0, value);
+    }
+  };
+
   this.clear = () => this.set(0);
 }
 
-// High / Low, asInteger
+// asInteger?
+// Proxy Object for array indicies?
+// Bounds checking?
 function IntegerField({
   bits = 8, size = 256, signed = false
 } = {}) {
   const bytes = Math.ceil(bits / 8);
   const data = new ArrayBuffer(bytes * size);
   const view = new DataView(data);
+
+  Object.defineProperty(this, 'bits', {
+    get: () => bits
+  });
+
+  Object.defineProperty(this, 'signed', {
+    get: () => signed
+  });
+
+  Object.defineProperty(this, 'bytes', {
+    get: () => bytes
+  });
+
+  Object.defineProperty(this, 'size', {
+    get: () => size
+  });
+
+  Object.defineProperty(this, 'length', {
+    get: () => size
+  });
 
   this.get = function(index) {
     const offset = index * bytes;
@@ -221,8 +285,49 @@ function IntegerField({
     }
   };
 
+  this.getHigh = function(index) {
+    const offset = index * bytes;
+
+    if (bits === 32) {
+      if (signed) {
+        return view.getInt16(offset);
+      } else {
+        return view.getUint16(offset);
+      }
+    } else if (bits === 16) {
+      if (signed) {
+        return view.getInt8(offset);
+      } else {
+        return view.getUint8(offset);
+      }
+    } else {
+      return (view.getUint8(offset) & 0xF0) >> 4;
+    }
+  };
+
+  this.getLow = function(index) {
+    const offset = index * bytes;
+
+    if (bits === 32) {
+      if (signed) {
+        return view.getInt16(offset + 2);
+      } else {
+        return view.getUint16(offset + 2);
+      }
+    } else if (bits === 16) {
+      if (signed) {
+        return view.getInt8(offset + 1);
+      } else {
+        return view.getUint8(offset + 1);
+      }
+    } else {
+      return view.getUint8(offset) & 0x0F;
+    }
+  };
+
   this.set = function(index, value = 0) {
     const offset = index * bytes;
+
     if (bits === 32) {
       if (signed) {
         return view.setInt32(offset, value);
@@ -241,6 +346,48 @@ function IntegerField({
       } else {
         return view.setUint8(offset, value);
       }
+    }
+  };
+
+  this.setHigh = function(index, value = 0) {
+    const offset = index * bytes;
+
+    if (bits === 32) {
+      if (signed) {
+        return view.setInt16(offset, value);
+      } else {
+        return view.setUint16(offset, value);
+      }
+    } else if (bits === 16) {
+      if (signed) {
+        return view.setInt8(offset, value);
+      } else {
+        return view.setUint8(offset, value);
+      }
+    } else {
+      value = (view.getUint8(offset) & 0x0F) | ((value << 4) & 0xF0);
+      return view.setUint8(offset, value);
+    }
+  };
+
+  this.setLow = function(index, value = 0) {
+    const offset = index * bytes;
+
+    if (bits === 32) {
+      if (signed) {
+        return view.setInt16(offset + 2, value);
+      } else {
+        return view.setUint16(offset + 2, value);
+      }
+    } else if (bits === 16) {
+      if (signed) {
+        return view.setInt8(offset + 1, value);
+      } else {
+        return view.setUint8(offset + 1, value);
+      }
+    } else {
+      value = (view.getUint8(offset) & 0xF0) | (value & 0x0F);
+      return view.setUint8(offset, value);
     }
   };
 

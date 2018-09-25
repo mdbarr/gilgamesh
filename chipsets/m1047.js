@@ -45,6 +45,7 @@ function m1047() {
     bits: chipset.bits,
     signed: false
   });
+
   const ip = new architecture.Integer({
     bits: chipset.bits,
     signed: false
