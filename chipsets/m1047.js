@@ -41,6 +41,9 @@ function m1047() {
     signed: true
   });
 
+  //////////
+  // Further abstraction? push, pop? built into integer field?
+  //  or ram / rom abstractions?
   const sp = new architecture.Integer({
     bits: chipset.bits,
     signed: false

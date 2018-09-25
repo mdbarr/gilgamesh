@@ -91,6 +91,14 @@ function BitField(bits = 8) {
   };
 }
 
+BitField.prototype.valueOf = function() {
+  return this.value();
+};
+
+BitField.prototype.toString = function() {
+  return this.value().toString(2);
+};
+
 function Integer({
   bits = 8, signed = false
 } = {}) {
@@ -230,6 +238,14 @@ function Integer({
 
   this.clear = () => this.set(0);
 }
+
+Integer.prototype.valueOf = function() {
+  return this.get();
+};
+
+Integer.prototype.toString = function() {
+  return this.get().toString();
+};
 
 // asInteger?
 // Proxy Object for array indicies?
