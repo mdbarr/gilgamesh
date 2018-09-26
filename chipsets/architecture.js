@@ -47,16 +47,17 @@ const INSTRUCTIONS = {
 };
 
 function BitField(bits = 8) {
+  const self = this;
   const bytes = Math.ceil(bits / 8);
   const field = new Uint8Array(bytes);
 
-  this.get = function(index) {
+  self.get = function(index) {
     const offset = index >> 3;
     const value = field[offset];
     return !!(value & (128 >> (index % 8)));
   };
 
-  this.set = function(index, set = true) {
+  self.set = function(index, set = true) {
     const offset = index >> 3;
     if (!!set === true) {
       field[offset] |= 128 >> (index % 8);
@@ -65,15 +66,15 @@ function BitField(bits = 8) {
     }
   };
 
-  this.clear = function(index) {
+  self.clear = function(index) {
     if (index !== undefined) {
-      this.set(index, false);
+      self.set(index, false);
     } else {
       field.fill(0, bytes, 0);
     }
   };
 
-  this.value = function() {
+  self.value = function() {
     let value = 0;
     for (let i = 0; i < bytes; i++) {
       value = value << 8;
@@ -82,12 +83,32 @@ function BitField(bits = 8) {
     return value;
   };
 
-  this.toInteger = function() {
+  self.toInteger = function() {
     const integer = new Integer({
       bits
     });
-    integer.set(this.value());
+    integer.set(self.value());
     return integer;
+  };
+
+  self[Symbol.iterator] = function() {
+    return {
+      next: function() {
+        if (this._index < bits) {
+          const value = self.get(this._index);
+          this._index++;
+          return {
+            value,
+            done: false
+          };
+        } else {
+          return {
+            done: true
+          };
+        }
+      },
+      _index: 0
+    };
   };
 }
 
