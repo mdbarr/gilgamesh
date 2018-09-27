@@ -88,7 +88,14 @@ NetFS Filetable entry
   GPIO / Misc Devices and Sensors
     CPU Temp Sensors + Fans = crash
   overclock
-
+  random number generator instruction
+  encrypt / decrypt instruction
+  devices using shared memory based on event emitters
+  classify memory regions (rom, io, ram)
+    Address space abstraction?
+  cpu modes / rings
+  clock ticks instead of cycles
+    tick as an idealized unit of time
 
 Cracking
 NOPs are often involved when cracking software that checks for serial numbers, specific hardware or software requirements, presence or absence of hardware dongles, etc. This is accomplished by altering functions and subroutines to bypass security checks and instead simply return the expected value being checked for. Because most of the instructions in the security check routine will be unused, these would be replaced with NOPs, thus removing the software's security functionality without attracting any attention.

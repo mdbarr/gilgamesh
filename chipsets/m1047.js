@@ -2,15 +2,18 @@
 
 const architecture = require('./architecture');
 
+// Event listeners
 function m1047() {
   const chipset = {
     bits: 8,
     registers: 8,
     io: {
       digital: 4,
-      analog: 2
+      analog: 2,
+      mapped: 32
     },
     ram: 256,
+    rom: 64,
     speed: 16
   };
 
@@ -32,12 +35,23 @@ function m1047() {
       bits: chipset.bits,
       size: chipset.io.analog,
       signed: false
+    }),
+    mapped: new architecture.IntegerField({
+      bits: chipset.bits,
+      size: chipset.io.mapped,
+      signed: false
     })
   };
 
   const ram = new architecture.IntegerField({
     bits: chipset.bits,
     size: Math.min(chipset.ram, RAM_MAX),
+    signed: true
+  });
+
+  const rom = new architecture.IntegerField({
+    bits: chipset.bits,
+    size: Math.min(chipset.rom, RAM_MAX),
     signed: true
   });
 
@@ -61,11 +75,13 @@ function m1047() {
 
   io.digital.clear();
   io.analog.clear();
+  io.mapped.clear();
 
   sp.clear();
   ip.clear();
 
   ram.clear();
+  rom.clear();
 
   //////////
 

@@ -1,5 +1,8 @@
 'use strict';
 
+const VERSION = 1;
+
+// Code?
 const FLAGS = {
   ZF: 0, // Zero Flag
   CF: 1, // Carry Flag
@@ -11,38 +14,56 @@ const FLAGS = {
   IF: 7 // Interrupt Enabled Flag
 };
 
-const INSTRUCTION_SET = {
-  NOP: 0, // No Operation
-
-  // Arithmetic and Logic Instructions
-  ADD: 1, // Add without Carry
-  ADC: 2, // Add with Carry
-  ADIW: 3, // Add Immediate to Word
-
-  SUB: 4, // Subtract without Carry
-  SUBI: 5, // Subtract Immediate
-  SBC: 6, // Subtract with Carry
-  SBCI: 7, // Subtract Immediate with Carry
-  SBIW: 8, // Subtract Immediate from Word
-
-  AND: 9, // Logical And
-  ANDI: 10 // Logical And with Immediate
+// Pattern(s) for assembler?
+const OPERANDS = {
+  D: 'D', // Destination Register
+  S: 'S', // Source Register
+  R: 'R', // Result after instruction execution
+  K: 'K', // Constant data,
+  k: 'k', // Constant address
+  b: 'b', // Bit in an I/O Register
+  s: 's', // Bit in the Status Register,
+  X: 'X', // Indirect Address Register r27/26
+  Y: 'Y', // Indirect Address Register r29/28
+  Z: 'Z', // Indirect Address Register r31/30
+  A: 'A' // I/O location address
 };
 
+// Implementation?
+// Squashing?
+// Bit widths for Operands?
+// Negative chipset for exact match instead of gte?
 const INSTRUCTIONS = {
-  NOP: { // No Operation
+  VERSION: {
     chipset: 8,
-    opcode: 0x00
+    operands: [ OPERANDS.D ],
+    immediate: VERSION
   },
-  ADD: { // Add without Carry
-    chipset: 8,
-    opcode: 0x01,
-    operands: [ 'Rd', 'Rr' ]
+  NOP: { // No Operation
+    chipset: 8
   },
   ADC: { // Add with Carry
     chipset: 8,
-    opcode: 0x02,
-    operands: [ 'Rd', 'Rr' ]
+    description: 'Adds two registers and the contents of the C Flag and places the result in the destination register Rd.',
+    operands: [ OPERANDS.D, OPERANDS.S ],
+    flags: [ FLAGS.ZF, FLAGS.CF ]
+  },
+  ADD: { // Add without Carry
+    chipset: 8,
+    description: 'Adds two registers without the C Flag and places the result in the destination register Rd.',
+    operands: [ OPERANDS.D, OPERANDS.S ],
+    flags: [ FLAGS.ZF, FLAGS.CF ]
+  },
+  ADI: {
+    chipset: 8,
+    description: 'Adds an immediate value to a register and places the result in the register.',
+    operands: [ OPERANDS.D, OPERANDS.K ]
+  },
+  AND: {
+    chipset: 8,
+    description: 'Performs the logical AND between the contents of register D and register S, and places the result in the destination register D.',
+    operands: [ OPERANDS.D, OPERANDS.S ],
+    flags: [ FLAGS.ZF, FLAGS.CF ]
   }
 };
 
@@ -120,6 +141,7 @@ BitField.prototype.toString = function() {
   return this.value().toString(2);
 };
 
+// Get and Set Bit
 function Integer({
   bits = 8, signed = false
 } = {}) {
@@ -271,6 +293,9 @@ Integer.prototype.toString = function() {
 // asInteger?
 // Proxy Object for array indicies?
 // Bounds checking?
+// Subset for memory mapped I/O - or Address Space
+// Get and Set Bit
+// Load, Save
 function IntegerField({
   bits = 8, size = 256, signed = false
 } = {}) {
@@ -441,7 +466,7 @@ function IntegerField({
 
 module.exports = {
   FLAGS,
-  INSTRUCTION_SET,
+  OPERANDS,
   INSTRUCTIONS,
   BitField,
   Integer,

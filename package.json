@@ -11,6 +11,6 @@
     "eslint": "^5.6.0"
   },
   "scripts": {
-    "lint": "eslint index.js chipsets/*.js"
+    "lint": "eslint index.js chipsets/*.js bin/*.js"
   }
 }
