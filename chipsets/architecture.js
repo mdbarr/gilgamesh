@@ -4,14 +4,14 @@ const VERSION = 1;
 
 // Code?
 const FLAGS = {
-  ZF: 0, // Zero Flag
-  CF: 1, // Carry Flag
-  OF: 2, // Overflow Flag
-  PF: 3, // Parity Flag
-  TF: 4, // Trap Flag
-  HF: 5, // Half Carry Flag
-  SF: 6, // Sign Flag (Negative Flag)
-  IF: 7 // Interrupt Enabled Flag
+  C: 0, // Carry Flag
+  Z: 1, // Zero Flag
+  N: 2, // Negative Flag
+  V: 2, // Two Complement Overflow indicator
+  S: 3, // Signed Flag - N XOR V
+  H: 4, // Half Carry Flag
+  T: 6, // Transfer Bit
+  I: 7 // Global Interrupt Enabled/Disable Flag
 };
 
 // Pattern(s) for assembler?
@@ -21,7 +21,7 @@ const OPERANDS = {
   R: 'R', // Result after instruction execution
   K: 'K', // Constant data,
   k: 'k', // Constant address
-  b: 'b', // Bit in an I/O Register
+  b: 'b', // Bit in an General Register or I/O Register
   s: 's', // Bit in the Status Register,
   X: 'X', // Indirect Address Register r27/26
   Y: 'Y', // Indirect Address Register r29/28
@@ -33,6 +33,7 @@ const OPERANDS = {
 // Squashing?
 // Bit widths for Operands?
 // Negative chipset for exact match instead of gte?
+// Uint8 for everything, arbitrary bit lengths
 const INSTRUCTIONS = {
   VERSION: {
     chipset: 8,
@@ -44,26 +45,54 @@ const INSTRUCTIONS = {
   },
   ADC: { // Add with Carry
     chipset: 8,
-    description: 'Adds two registers and the contents of the C Flag and places the result in the destination register Rd.',
+    description: 'Adds two registers and the contents of the C Flag and places the result in the destination register.',
     operands: [ OPERANDS.D, OPERANDS.S ],
-    flags: [ FLAGS.ZF, FLAGS.CF ]
+    flags: [ FLAGS.Z, FLAGS.C ]
   },
   ADD: { // Add without Carry
     chipset: 8,
-    description: 'Adds two registers without the C Flag and places the result in the destination register Rd.',
+    description: 'Adds two registers without the C Flag and places the result in the destination register.',
     operands: [ OPERANDS.D, OPERANDS.S ],
-    flags: [ FLAGS.ZF, FLAGS.CF ]
+    flags: [ FLAGS.Z, FLAGS.C ]
   },
   ADI: {
     chipset: 8,
     description: 'Adds an immediate value to a register and places the result in the register.',
-    operands: [ OPERANDS.D, OPERANDS.K ]
+    operands: [ OPERANDS.D, OPERANDS.K ],
+    flags: [ FLAGS.S, FLAGS.Z ]
   },
   AND: {
     chipset: 8,
     description: 'Performs the logical AND between the contents of register D and register S, and places the result in the destination register D.',
     operands: [ OPERANDS.D, OPERANDS.S ],
-    flags: [ FLAGS.ZF, FLAGS.CF ]
+    flags: [ FLAGS.Z, FLAGS.C ]
+  },
+  ANDI: {
+    chipset: 8,
+    description: 'Performs the logical AND between the contents of register D and a constant, and places the result in the destination register D',
+    operand: [ OPERANDS.D, OPERANDS.K ],
+    flags: [ FLAGS.S, FLAGS.Z ]
+  },
+  ASR: {
+    chipset: 8,
+    description: 'Shifts all bits in D one place to the right. Bit 7 is held constant. Bit 0 is loaded into the C Flag of the SREG. This operation effectively divides a signed value by two without changing its sign. The Carry Flag can be used to round the result.',
+    operands: [ OPERANDS.D ],
+    flags: [ FLAGS.S, FLAGS.Z ]
+  },
+  BCLR: {
+    chipset: 8,
+    description: 'Clears a single Flag in SREG.',
+    operands: [ OPERANDS.s ]
+  },
+  BLD: {
+    chipset: 8,
+    description: 'Copies the T Flag in the SREG (Status Register) to bit b in register D',
+    operands: [ OPERANDS.D, OPERANDS.b ]
+  },
+  BRBC: {
+    chipset: 8,
+    description: 'Conditional relative branch. Tests a single bit in SREG and branches relatively to PC if the bit is cleared. This instruction branches relatively to PC in either direction (PC - 63 ≤ destination ≤ PC + 64). Parameter k is the offset from PC and is represented in two’s complement form.',
+    operands: [ OPERANDS.s, OPERANDS.k ]
   }
 };
 
